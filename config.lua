@@ -2,7 +2,8 @@ Config = {}
 
 Config.debug = false
 
-Config.Framework = 'qb' -- 'qb' only (soon 'esx')
+Config.Framework = 'esx' -- 'qb', 'esx'
+Config.Phone = 'none' -- 'qb', 'qs', 'none'
 
 Config.Target = {
     [1] = {

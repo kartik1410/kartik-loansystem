@@ -25,6 +25,7 @@ if Config.Framework == 'qb' then
         local moneyInfo = json.decode(moneyData[1].money)
         moneyInfo.bank = math.floor((moneyInfo.bank + amount))
         MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?',{ json.encode(moneyInfo), citizenId })
+        return true
     end
 
     function Framework:RemoveMoneyByIdentifier(citizenId, type, amount, reason)
@@ -39,8 +40,58 @@ if Config.Framework == 'qb' then
         local moneyInfo = json.decode(moneyData[1].money)
         moneyInfo.bank = math.floor((moneyInfo.bank - amount))
         MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?',{ json.encode(moneyInfo), citizenId })
+        return true
+    end
+end
+
+if Config.Framework == 'esx' then
+    local ESX = exports.es_extended:getSharedObject()
+
+    function Framework:GetPlayer(source)
+        local player = ESX.GetPlayerFromId(source)
+        if not player then return false end
+        local _data = {
+            citizenid = player.identifier,
+            fullname = player.getName()
+        }
+        return _data
     end
 
+    function Framework:AddMoneyByIdentifier(identifier, type, amount, reason)
+        local player = ESX.GetPlayerFromIdentifier(identifier)
+        if not player then return false end
+        player.addAccountMoney(type, amount)
+        return true
+    end
+
+    function Framework:AddMoneyByIdentifierOffline(identifier, amount)
+        local moneyData = MySQL.Sync.fetchAll('SELECT accounts FROM users WHERE identifier = ?', {identifier })
+        if not moneyData[1] then return false end
+        local moneyInfo = json.decode(moneyData[1].accounts)
+        moneyInfo.bank = math.floor((moneyInfo.bank + amount))
+        MySQL.Async.execute('UPDATE users SET accounts = ? WHERE identifier = ?',{ json.encode(moneyInfo), identifier })
+        return true
+    end
+
+    function Framework:RemoveMoneyByIdentifier(identifier, type, amount, reason)
+        local player = ESX.GetPlayerFromIdentifier(identifier)
+        if not player then return false end
+        if player.getAccount(type).money < amount then return false end
+        player.removeAccountMoney(type, amount)
+        return true
+    end
+
+    function Framework:RemoveMoneyByIdentifierOffline(identifier, amount)
+        local moneyData = MySQL.Sync.fetchAll('SELECT accounts FROM users WHERE identifier = ?', {identifier })
+        if not moneyData[1] then return false end
+        local moneyInfo = json.decode(moneyData[1].accounts)
+        moneyInfo.bank = math.floor((moneyInfo.bank - amount))
+        MySQL.Async.execute('UPDATE users SET accounts = ? WHERE identifier = ?',{ json.encode(moneyInfo), identifier })
+        return true
+    end
+end
+
+if Config.Phone == 'qb' then
     function Framework:SendMail(citizenId, data)
         local maildata = {
             sender = data.sender,
@@ -49,6 +100,21 @@ if Config.Framework == 'qb' then
         }
         exports['qb-phone']:sendNewMailToOffline(citizenId, maildata)
     end
+end
+
+if Config.Phone == 'qs' then
+    function Framework:SendMail(identifier, data)
+        local maildata = {
+            sender = data.sender,
+            subject = data.subject,
+            message = data.message,
+        }
+        TriggerEvent('qs-smartphone:server:sendNewMailToOffline', identifier, maildata)
+    end
+end
+
+if Config.Phone == 'none' then
+    function Framework:SendMail(identifier, data) end
 end
 
 return Framework

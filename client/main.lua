@@ -72,7 +72,7 @@ function SendMail(data)
         message = input[2],
         citizenid = data.citizenid,
     }
-    TriggerServerEvent("loan-system:server:sendMail", SendMail)
+    TriggerServerEvent("loan-system:server:sendMail", sendMail)
 end
 
 function OpenMenu()
