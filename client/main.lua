@@ -490,35 +490,7 @@ function ViewLoanDetails(prevdata, prevargs, menu)
 end
 
 CreateThread(function()
-    for k, v in pairs(Config.Target) do
-        exports.ox_target:addBoxZone({
-            coords = v.coords,
-            size = v.size,
-            rotation = v.rotation,
-            debug = Config.debug,
-            options = {
-                {
-
-                    icon = 'fa fa-sitemap',
-                    label = "Access Bank",
-                    onSelect = function()
-                        OpenMenu()
-                    end,
-                    canInteract = function()
-                        return not lib.progressActive()
-                    end,
-                },
-                {
-                    icon = 'fa fa-coins',
-                    label = "Access Banker Menu",
-                    onSelect = function()
-                        OpenBankerMenu()
-                    end,
-                    canInteract = function()
-                        return Framework:HasAccess() and not lib.progressActive()
-                    end,
-                },
-            }
-        })
+    for index, data in pairs(Config.TargetZones) do
+        Framework:AddBoxZone(data, index)
     end
 end)

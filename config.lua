@@ -2,10 +2,25 @@ Config = {}
 
 Config.debug = false
 
-Config.Framework = 'esx' -- 'qb', 'esx'
-Config.Phone = 'none' -- 'qb', 'qs', 'none'
+Config.Framework = 'qb' -- 'qb', 'esx'
+Config.Phone = 'qb' -- 'qb', 'qs', 'none'
+Config.Target = 'ox' -- 'qb', 'ox'
 
-Config.Target = {
+--[[(QB TARGET)
+Config.TargetZones = {
+    [1] = {
+        name = 'Pacific Bank', -- Name of the bank
+        coords = vector3(241.6, 226.2, 106.0),
+        length = 3,
+        width = 3,
+        heading = 0,
+        minZ = 104.0,
+        maxZ = 108.0,
+    }
+}]]
+
+-- (OX TARGET)
+Config.TargetZones = {
     [1] = {
         name = 'Pacific Bank', -- Name of the bank
         coords = vec3(241.6, 226.2, 106.0),
