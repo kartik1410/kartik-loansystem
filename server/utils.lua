@@ -42,13 +42,12 @@ if Config.Framework == 'qb' then
     end
 
     function Framework:SendMail(citizenId, data)
-    if Config.Phone == "QB" then
-        exports['qb-phone']:sendNewMailToOffline(citizenId, data)
-    elseif Config.Phone == "QS" then
-        TriggerEvent('qs-smartphone:server:sendNewMailToOffline', citizenId, data)
-    end
-end
-
+        if Config.Phone == "QB" then
+            exports['qb-phone']:sendNewMailToOffline(citizenId, data)
+        elseif Config.Phone == "QS" then
+            TriggerEvent('qs-smartphone:server:sendNewMailToOffline', citizenId, data)
+        end
+    end    
 end
 
 return Framework
