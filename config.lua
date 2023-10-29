@@ -72,6 +72,7 @@ Config.CreditScore = {
     },
 }
 
+Config.Phone = "QS" --QB or QS
 
 Config.PhoneMails = {   -- qb-phone Compatible
     DueReminder = true, -- If True, It Will Send Reminder To The Player When Loan Is Due
