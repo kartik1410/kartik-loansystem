@@ -269,32 +269,31 @@ function OpenRequestLoan(scores)
             if nextKey then
                 local nextRange = optLoans[nextKey]
                 -- Check if the requested loan amount exceeds the maximum allowed
-                if scores >= currentRange.minCreditScore and scores < nextRange.minCreditScore then
+                if scores >= currentRange.minCreditScore and scores < nextRange.minCreditScore and not (scores >= nextRange.minCreditScore) then
                     interest = currentRange.interest
+                
+                    if input[2] > currentRange.maxAmount then
+                        lib.notify({
+                            description = "You are not eligible! You can take loan upto $" .. currentRange
+                                .maxAmount,
+                            type = "error"
+                        })
+                        return
+                    end
                 end
-                if input[2] > currentRange.maxAmount then
-                    lib.notify({
-                        description = "You are not eligible! You can take loan upto $" .. currentRange
-                            .maxAmount,
-                        type = "error"
-                    })
-                    return
-                end
-                break
             else
                 -- Check if the requested loan amount exceeds the maximum allowed
                 if scores >= currentRange.minCreditScore then
                     interest = currentRange.interest
+                    if input[2] > currentRange.maxAmount then
+                        lib.notify({
+                            description = "You are not eligible! You can take loan upto $" .. currentRange
+                                .maxAmount,
+                            type = "error"
+                        })
+                        return
+                    end
                 end
-                if input[2] > currentRange.maxAmount then
-                    lib.notify({
-                        description = "You are not eligible! You can take loan upto $" .. currentRange
-                            .maxAmount,
-                        type = "error"
-                    })
-                    return
-                end
-                break
             end
         end
     else
