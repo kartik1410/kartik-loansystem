@@ -18,7 +18,7 @@ local function loanPaidLoop()
                         Framework:RemoveMoneyByIdentifierOffline(v.citizenid, tonumber(duesdata.amount))
                     end
                     if GetResourceState("snipe-banking") == "started" then
-                        exports["snipe-banking"]:CreatePersonalTransactions(v.citizenid, tonumber(duesdata.amount), "Loan Payment for"..v.loan_id, "withdraw")
+                        exports["snipe-banking"]:CreatePersonalTransactions(v.citizenid, tonumber(duesdata.amount), "Loan Payment for Loan ID: "..v.loan_id, "withdraw")
                     end
                     if Config.CreditScore.Enable then
                         HandleScores(v.citizenid, "remove", tonumber(duesdata.amount))
@@ -226,9 +226,8 @@ RegisterNetEvent('loan-system:server:approveLoan', function(data)
     if not hasRemoved then
         Framework:AddMoneyByIdentifierOffline(cid, tonumber(loanDetails.requestedamount))
     end
-
     if GetResourceState("snipe-banking") == "started" then
-        exports["snipe-banking"]:CreatePersonalTransactions(cid, tonumber(loanDetails.requestedamount), "Loan Approved for"..data.loan_id, "deposit")
+        exports["snipe-banking"]:CreatePersonalTransactions(cid, tonumber(loanDetails.requestedamount), "Loan Approved for Loan ID: "..data.loan_id, "deposit")
     end
 
     if Config.PhoneMails.ApproveMail then
@@ -276,7 +275,7 @@ RegisterNetEvent("loan-system:server:payLoan", function(data)
     local loanDetails = json.decode(data.loan_details)
     if Framework:RemoveMoneyByIdentifier(cid, 'bank', tonumber(data.payamount), "banker-loan") then
         if GetResourceState("snipe-banking") == "started" then
-            exports["snipe-banking"]:CreatePersonalTransactions(cid, tonumber(data.payamount), "Loan Payment for"..data.loan_id, "withdraw")
+            exports["snipe-banking"]:CreatePersonalTransactions(cid, tonumber(data.payamount), "Loan Payment for Loan ID: "..data.loan_id, "withdraw")
         end
         loanDetails.remainingamount = tonumber(loanDetails.remainingamount) - tonumber(data.payamount)
         for k, v in pairs(loanDetails.dues) do
