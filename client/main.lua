@@ -1,39 +1,4 @@
 local Framework = require('client.utils')
-local istOffsetSeconds = 5 * 60 * 60 + 30 * 60
-
-function ConvertEpochToISTDateTime(epoch)
-    local epochIST = epoch + istOffsetSeconds
-    local secondsInMinute = 60
-    local minutesInHour = 60
-    local hoursInDay = 24
-    local totalSeconds = math.floor(epochIST)
-    local days = math.floor(totalSeconds / (secondsInMinute * minutesInHour * hoursInDay))
-    local secondsInDay = totalSeconds % (secondsInMinute * minutesInHour * hoursInDay)
-    local hours = math.floor(secondsInDay / (secondsInMinute * minutesInHour))
-    local minutes = math.floor((secondsInDay % (secondsInMinute * minutesInHour)) / secondsInMinute)
-    local seconds = secondsInDay % secondsInMinute
-    local year = 1970
-    local daysInYear = 365
-    while days >= daysInYear do
-        if (year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0) then
-            days = days - 366
-        else
-            days = days - 365
-        end
-        year = year + 1
-    end
-    local monthsInYear = {
-        31, (year % 4 == 0 and year % 100 ~= 0) or (year % 400 == 0) and 29 or 28,
-        31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-    }
-    local month = 1
-    while days >= monthsInYear[month] do
-        days = days - monthsInYear[month]
-        month = month + 1
-    end
-    local day = days + 1
-    return string.format("%02d-%02d-%04d %02d:%02d:%02d", day, month, year, hours, minutes, seconds)
-end
 
 function AlertBoxConfirmation(data)
     local alert = lib.alertDialog({
@@ -237,12 +202,12 @@ function OpenRequestLoan(scores)
         local creditScoreRequirement = Config.CreditScore.CreditScoreRequirementForLoans
         local loanRequirement = Config.CreditScore.Requirement[input[1]]
 
-        if not loanRequirement then  -- check if the loan type is configured
+        if not loanRequirement then -- check if the loan type is configured
             lib.notify({
                 description = "Requirements for this loan type are not configured yet! Please contact the bank manager",
                 type = "error"
             })
-            return 
+            return
         end
         -- Check if there is a credit score requirement for the specific loan type
         if creditScoreRequirement and loanRequirement then
@@ -255,12 +220,12 @@ function OpenRequestLoan(scores)
         end
         local optLoans = Config.CreditScore.OptLoan[input[1]]
         -- Check if loan options are configured for the specific loan type
-        if not optLoans then 
+        if not optLoans then
             lib.notify({
                 description = "Requirements for this loan type are not configured yet! Please contact the bank manager",
                 type = "error"
             })
-            return 
+            return
         end
         -- Loop through the credit scoring options for the loan type
         for k, v in pairs(optLoans) do
@@ -271,7 +236,7 @@ function OpenRequestLoan(scores)
                 -- Check if the requested loan amount exceeds the maximum allowed
                 if scores >= currentRange.minCreditScore and scores < nextRange.minCreditScore and not (scores >= nextRange.minCreditScore) then
                     interest = currentRange.interest
-                
+
                     if input[2] > currentRange.maxAmount then
                         lib.notify({
                             description = "You are not eligible! You can take loan upto $" .. currentRange
@@ -315,7 +280,8 @@ function OpenRequestLoan(scores)
     }
     local alertdata = {
         header = 'Hello there',
-        content = 'Are you sure you want to request a loan of $' ..data.amount .. ' for ' .. data.duration .. ' weeks with total interest of $' .. (data.interest) .. ' ?',
+        content = 'Are you sure you want to request a loan of $' ..
+            data.amount .. ' for ' .. data.duration .. ' weeks with total interest of $' .. (data.interest) .. ' ?',
     }
     local confirm = AlertBoxConfirmation(alertdata)
     if confirm then
@@ -374,28 +340,28 @@ function ViewLoanDetails(prevdata, prevargs, menu)
         status = 'Rejected'
     end
     local options = {
-        { label = 'Loan ID : #' .. data.loan_id,                                             close = false },
-        { label = 'Loan Type : ' .. loandetails.loantype,                                    close = false },
-        { label = 'Amount Requested: $' .. loandetails.requestedamount,                      close = false },
-        { label = 'Loan Interest : ' .. loandetails.interest .. '%',                         close = false },
-        { label = 'Total Amount : $' .. loandetails.amount,                                  close = false },
-        { label = 'Remaining Amount : $' .. loandetails.remainingamount,                     close = false },
-        { label = 'Reason : ' .. loandetails.reason,                                         close = false },
-        { label = 'Status : ' .. status,                                                     close = false },
-        { label = 'Request Time : ' .. ConvertEpochToISTDateTime(loandetails.requestedtime), close = false },
-        { label = 'Loan Duration : ' .. loandetails.duration .. ' Weeks',                    close = false },
+        { label = 'Loan ID : #' .. data.loan_id,                          close = false },
+        { label = 'Loan Type : ' .. loandetails.loantype,                 close = false },
+        { label = 'Amount Requested: $' .. loandetails.requestedamount,   close = false },
+        { label = 'Loan Interest : ' .. loandetails.interest .. '%',      close = false },
+        { label = 'Total Amount : $' .. loandetails.amount,               close = false },
+        { label = 'Remaining Amount : $' .. loandetails.remainingamount,  close = false },
+        { label = 'Reason : ' .. loandetails.reason,                      close = false },
+        { label = 'Status : ' .. status,                                  close = false },
+        { label = 'Request Time : ' .. loandetails.requestedtime,         close = false },
+        { label = 'Loan Duration : ' .. loandetails.duration .. ' Weeks', close = false },
     }
     if data.status == 1 or data.status == 3 then -- When Status is approved or paid
         local values = {}
         table.insert(options,
-            { label = 'Loan Approved : ' .. ConvertEpochToISTDateTime(loandetails.starttime), close = false })
+            { label = 'Loan Approved : ' .. loandetails.starttime, close = false })
         table.insert(options, {
-            label = 'Loan Paid Off : ' .. ConvertEpochToISTDateTime(loandetails.endtime),
+            label = 'Loan Paid Off : ' .. loandetails.endtime,
             close = false
         })
         for k, v in pairs(loandetails.dues) do
             if not v.paid then
-                table.insert(values, '#' .. k .. ': ' .. ConvertEpochToISTDateTime(v.time) .. " | $" .. v.amount)
+                table.insert(values, '#' .. k .. ': ' .. v.time .. " | $" .. v.amount)
             end
         end
         if #values ~= 0 then

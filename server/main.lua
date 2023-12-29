@@ -13,12 +13,10 @@ local function loanPaidLoop()
         for _, duesdata in pairs(loanDetails.dues) do
             if not duesdata.paid then
                 if os.time() >= duesdata.time then
-                    local hasRemoved = Framework:RemoveMoneyByIdentifier(v.citizenid, 'bank', tonumber(duesdata.amount), "banker-loan")
+                    local hasRemoved = Framework:RemoveMoneyByIdentifier(v.citizenid, 'bank', tonumber(duesdata.amount),
+                        "banker-loan")
                     if not hasRemoved then
                         Framework:RemoveMoneyByIdentifierOffline(v.citizenid, tonumber(duesdata.amount))
-                    end
-                    if GetResourceState("snipe-banking") == "started" then
-                        exports["snipe-banking"]:CreatePersonalTransactions(v.citizenid, tonumber(duesdata.amount), "Loan Payment for Loan ID: "..v.loan_id, "withdraw")
                     end
                     if Config.CreditScore.Enable then
                         HandleScores(v.citizenid, "remove", tonumber(duesdata.amount))
@@ -41,8 +39,11 @@ AddEventHandler('onResourceStart', function(resourceName)
     if (GetCurrentResourceName() ~= resourceName) then
         return
     end
-    if Config.AutomaticDeduction then Wait(5000) loanPaidLoop() end -- Start the loop to deduct loan payments
-    if Config.PhoneMails.DueReminder then                -- Start the loop to send loan payment reminders on script restart
+    if Config.AutomaticDeduction then
+        Wait(5000)
+        loanPaidLoop()
+    end                                   -- Start the loop to deduct loan payments
+    if Config.PhoneMails.DueReminder then -- Start the loop to send loan payment reminders on script restart
         local data = MySQL.query.await('SELECT * FROM players_loan WHERE status = 1', {})
         for k, v in pairs(data) do
             local loanDetails = json.decode(v.loan_details)
@@ -147,6 +148,30 @@ lib.callback.register('loan-system:server:getLoans', function(source)
         end
         table.insert(returnData.All, v)
     end
+    for _, statusData in pairs(returnData) do
+        for _, loanDetails in pairs(statusData) do
+            local loanDetailsDecoded = json.decode(loanDetails.loan_details)
+            for _, duesdata in pairs(loanDetailsDecoded.dues) do
+                if duesdata.time then
+                    local time = os.date("%c", tonumber(duesdata.time))
+                    duesdata.time = time
+                end
+                if duesdata.starttime then
+                    local starttime = os.date("%c", tonumber(duesdata.starttime))
+                    duesdata.starttime = starttime
+                end
+                if duesdata.endtime then
+                    local endtime = os.date("%c", tonumber(duesdata.endtime))
+                    duesdata.endtime = endtime
+                end
+                if duesdata.requestedtime then
+                    local requestedtime = os.date("%c", tonumber(duesdata.requestedtime))
+                    duesdata.requestedtime = requestedtime
+                end
+            end
+            loanDetails.loan_details = json.encode(loanDetailsDecoded)
+        end
+    end
     return returnData
 end)
 
@@ -154,6 +179,28 @@ lib.callback.register('loan-system:server:getMyLoans', function(source)
     local Player = Framework:GetPlayer(source)
     local cid = Player.citizenid
     local data = MySQL.query.await('SELECT * FROM players_loan WHERE citizenid =?', { cid })
+    for _, statusData in pairs(data) do
+        local loanDetailsDecoded = json.decode(statusData.loan_details)
+        for _, duesdata in pairs(loanDetailsDecoded.dues) do
+            if duesdata.time then
+                local time = os.date("%c", tonumber(duesdata.time))
+                duesdata.time = time
+            end
+            if duesdata.starttime then
+                local starttime = os.date("%c", tonumber(duesdata.starttime))
+                duesdata.starttime = starttime
+            end
+            if duesdata.endtime then
+                local endtime = os.date("%c", tonumber(duesdata.endtime))
+                duesdata.endtime = endtime
+            end
+            if duesdata.requestedtime then
+                local requestedtime = os.date("%c", tonumber(duesdata.requestedtime))
+                duesdata.requestedtime = requestedtime
+            end
+        end
+        statusData.loan_details = json.encode(loanDetailsDecoded)
+    end
     return data
 end)
 
@@ -226,10 +273,6 @@ RegisterNetEvent('loan-system:server:approveLoan', function(data)
     if not hasRemoved then
         Framework:AddMoneyByIdentifierOffline(cid, tonumber(loanDetails.requestedamount))
     end
-    if GetResourceState("snipe-banking") == "started" then
-        exports["snipe-banking"]:CreatePersonalTransactions(cid, tonumber(loanDetails.requestedamount), "Loan Approved for Loan ID: "..data.loan_id, "deposit")
-    end
-
     if Config.PhoneMails.ApproveMail then
         local maildata = {
             sender = "Banker",
@@ -274,9 +317,6 @@ RegisterNetEvent("loan-system:server:payLoan", function(data)
     local cid = data.citizenid
     local loanDetails = json.decode(data.loan_details)
     if Framework:RemoveMoneyByIdentifier(cid, 'bank', tonumber(data.payamount), "banker-loan") then
-        if GetResourceState("snipe-banking") == "started" then
-            exports["snipe-banking"]:CreatePersonalTransactions(cid, tonumber(data.payamount), "Loan Payment for Loan ID: "..data.loan_id, "withdraw")
-        end
         loanDetails.remainingamount = tonumber(loanDetails.remainingamount) - tonumber(data.payamount)
         for k, v in pairs(loanDetails.dues) do
             if v.due == tonumber(data.due) then
@@ -342,7 +382,7 @@ RegisterNetEvent("loan-system:server:firstTimeCredits", function()
 end)
 
 MySQL.ready(function()
-    local success, result = pcall(MySQL.query.await, "SELECT 1 FROM players_loan LIMIT 1") 
+    local success, result = pcall(MySQL.query.await, "SELECT 1 FROM players_loan LIMIT 1")
     if not success then
         -- Create 'players_loan' table if it doesn't exist
         success, result = pcall(MySQL.query, [[
