@@ -151,27 +151,27 @@ lib.callback.register('loan-system:server:getLoans', function(source)
     for _, statusData in pairs(returnData) do
         for _, loanDetails in pairs(statusData) do
             local loanDetailsDecoded = json.decode(loanDetails.loan_details)
+            if loanDetailsDecoded.starttime then
+                local starttime = os.date("%c", tonumber(loanDetailsDecoded.starttime))
+                loanDetailsDecoded.starttime = starttime
+            end
+            if loanDetailsDecoded.endtime then
+                local endtime = os.date("%c", tonumber(loanDetailsDecoded.endtime))
+                loanDetailsDecoded.endtime = endtime
+            end
+            if loanDetailsDecoded.requestedtime then
+                local requestedtime = os.date("%c", tonumber(loanDetailsDecoded.requestedtime))
+                loanDetailsDecoded.requestedtime = requestedtime
+            end
             if loanDetailsDecoded.dues then
                 for _, duesdata in pairs(loanDetailsDecoded.dues) do
                     if duesdata.time then
                         local time = os.date("%c", tonumber(duesdata.time))
                         duesdata.time = time
                     end
-                    if duesdata.starttime then
-                        local starttime = os.date("%c", tonumber(duesdata.starttime))
-                        duesdata.starttime = starttime
-                    end
-                    if duesdata.endtime then
-                        local endtime = os.date("%c", tonumber(duesdata.endtime))
-                        duesdata.endtime = endtime
-                    end
-                    if duesdata.requestedtime then
-                        local requestedtime = os.date("%c", tonumber(duesdata.requestedtime))
-                        duesdata.requestedtime = requestedtime
-                    end
                 end
-                loanDetails.loan_details = json.encode(loanDetailsDecoded)
             end
+            loanDetails.loan_details = json.encode(loanDetailsDecoded)
         end
     end
     return returnData
@@ -183,6 +183,18 @@ lib.callback.register('loan-system:server:getMyLoans', function(source)
     local data = MySQL.query.await('SELECT * FROM players_loan WHERE citizenid =?', { cid })
     for _, statusData in pairs(data) do
         local loanDetailsDecoded = json.decode(statusData.loan_details)
+        if loanDetailsDecoded.starttime then
+            local starttime = os.date("%c", tonumber(loanDetailsDecoded.starttime))
+            loanDetailsDecoded.starttime = starttime
+        end
+        if loanDetailsDecoded.endtime then
+            local endtime = os.date("%c", tonumber(loanDetailsDecoded.endtime))
+            loanDetailsDecoded.endtime = endtime
+        end
+        if loanDetailsDecoded.requestedtime then
+            local requestedtime = os.date("%c", tonumber(loanDetailsDecoded.requestedtime))
+            loanDetailsDecoded.requestedtime = requestedtime
+        end
         if loanDetailsDecoded.dues then
             for _, duesdata in pairs(loanDetailsDecoded.dues) do
                 if duesdata.time then
@@ -202,8 +214,8 @@ lib.callback.register('loan-system:server:getMyLoans', function(source)
                     duesdata.requestedtime = requestedtime
                 end
             end
-            statusData.loan_details = json.encode(loanDetailsDecoded)
         end
+        statusData.loan_details = json.encode(loanDetailsDecoded)
     end
     return data
 end)
