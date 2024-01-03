@@ -348,20 +348,20 @@ function ViewLoanDetails(prevdata, prevargs, menu)
         { label = 'Remaining Amount : $' .. loandetails.remainingamount,  close = false },
         { label = 'Reason : ' .. loandetails.reason,                      close = false },
         { label = 'Status : ' .. status,                                  close = false },
-        { label = 'Request Time : ' .. loandetails.requestedtime,         close = false },
+        { label = 'Request Time : ' .. loandetails.convertedrequestedtime,         close = false },
         { label = 'Loan Duration : ' .. loandetails.duration .. ' Weeks', close = false },
     }
     if data.status == 1 or data.status == 3 then -- When Status is approved or paid
         local values = {}
         table.insert(options,
-            { label = 'Loan Approved : ' .. loandetails.starttime, close = false })
+            { label = 'Loan Approved : ' .. loandetails.convertedstarttime, close = false })
         table.insert(options, {
-            label = 'Loan Paid Off : ' .. loandetails.endtime,
+            label = 'Loan Paid Off : ' .. loandetails.convertedendtime,
             close = false
         })
         for k, v in pairs(loandetails.dues) do
             if not v.paid then
-                table.insert(values, '#' .. k .. ': ' .. v.time .. " | $" .. v.amount)
+                table.insert(values, '#' .. k .. ': ' .. v.convertedtime .. " | $" .. v.amount)
             end
         end
         if #values ~= 0 then
@@ -408,7 +408,7 @@ function ViewLoanDetails(prevdata, prevargs, menu)
             local values = {}
             for k, v in pairs(loandetails.dues) do
                 if not v.paid then
-                    table.insert(values, { amount = v.amount, time = v.time, due = v.due })
+                    table.insert(values, { amount = v.amount, time = v.convertedtime, due = v.due })
                 end
             end
             if #values == 0 then

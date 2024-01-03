@@ -153,21 +153,21 @@ lib.callback.register('loan-system:server:getLoans', function(source)
             local loanDetailsDecoded = json.decode(loanDetails.loan_details)
             if loanDetailsDecoded.starttime then
                 local starttime = os.date("%c", tonumber(loanDetailsDecoded.starttime))
-                loanDetailsDecoded.starttime = starttime
+                loanDetailsDecoded.convertedstarttime = starttime
             end
             if loanDetailsDecoded.endtime then
                 local endtime = os.date("%c", tonumber(loanDetailsDecoded.endtime))
-                loanDetailsDecoded.endtime = endtime
+                loanDetailsDecoded.convertedendtime = endtime
             end
             if loanDetailsDecoded.requestedtime then
                 local requestedtime = os.date("%c", tonumber(loanDetailsDecoded.requestedtime))
-                loanDetailsDecoded.requestedtime = requestedtime
+                loanDetailsDecoded.convertedrequestedtime = requestedtime
             end
             if loanDetailsDecoded.dues then
                 for _, duesdata in pairs(loanDetailsDecoded.dues) do
                     if duesdata.time then
                         local time = os.date("%c", tonumber(duesdata.time))
-                        duesdata.time = time
+                        duesdata.convertedtime = time
                     end
                 end
             end
@@ -185,33 +185,21 @@ lib.callback.register('loan-system:server:getMyLoans', function(source)
         local loanDetailsDecoded = json.decode(statusData.loan_details)
         if loanDetailsDecoded.starttime then
             local starttime = os.date("%c", tonumber(loanDetailsDecoded.starttime))
-            loanDetailsDecoded.starttime = starttime
+            loanDetailsDecoded.convertedstarttime = starttime
         end
         if loanDetailsDecoded.endtime then
             local endtime = os.date("%c", tonumber(loanDetailsDecoded.endtime))
-            loanDetailsDecoded.endtime = endtime
+            loanDetailsDecoded.convertedendtime = endtime
         end
         if loanDetailsDecoded.requestedtime then
             local requestedtime = os.date("%c", tonumber(loanDetailsDecoded.requestedtime))
-            loanDetailsDecoded.requestedtime = requestedtime
+            loanDetailsDecoded.convertedrequestedtime = requestedtime
         end
         if loanDetailsDecoded.dues then
             for _, duesdata in pairs(loanDetailsDecoded.dues) do
                 if duesdata.time then
                     local time = os.date("%c", tonumber(duesdata.time))
-                    duesdata.time = time
-                end
-                if duesdata.starttime then
-                    local starttime = os.date("%c", tonumber(duesdata.starttime))
-                    duesdata.starttime = starttime
-                end
-                if duesdata.endtime then
-                    local endtime = os.date("%c", tonumber(duesdata.endtime))
-                    duesdata.endtime = endtime
-                end
-                if duesdata.requestedtime then
-                    local requestedtime = os.date("%c", tonumber(duesdata.requestedtime))
-                    duesdata.requestedtime = requestedtime
+                    duesdata.convertedtime = time
                 end
             end
         end
