@@ -30,6 +30,7 @@ And Much More: This Loan Management System is loaded with additional features to
 # Installation
 
 - Download the resource.
+- Run `loansystem.sql`
 - Configure config.lua according to your needs.
 - Add `ensure kartik-loansystem` to server.cfg.
 
