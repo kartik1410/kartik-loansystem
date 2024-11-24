@@ -9,20 +9,17 @@ if Config.Framework == 'qb' then
         if player then
             return {
                 citizenid = player.PlayerData.citizenid,
-                fullname = ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname),
-                phonenumber = player.PlayerData.charinfo.phone
+                fullname = ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname)
             }
         else
             local result = MySQL.single.await([[
                 SELECT citizenid,
-                    CONCAT (JSON_UNQUOTE(JSON_EXTRACT (charinfo, '$.firstname')), ' ', JSON_UNQUOTE (JSON_EXTRACT (charinfo, '$.lastname'))) AS fullname,
-                    JSON_UNQUOTE(JSON_EXTRACT(charinfo, "$.phone")) as phonenumber
+                    CONCAT (JSON_UNQUOTE(JSON_EXTRACT (charinfo, '$.firstname')), ' ', JSON_UNQUOTE (JSON_EXTRACT (charinfo, '$.lastname'))) AS fullname
                 FROM players WHERE citizenid = ? LIMIT 1
             ]], { source })
             return {
                 citizenid = result.citizenid,
-                fullname = result.fullname,
-                phonenumber = result.phonenumber
+                fullname = result.fullname
             }
         end
     end
@@ -72,14 +69,12 @@ if Config.Framework == 'esx' then
         else
             local result = MySQL.single.await([[
                 SELECT citizenid,
-                    CONCAT(firstname, ' ', lastname) as fullname,
-                    phone_number as phonenumber
+                    CONCAT(firstname, ' ', lastname) as fullname
                 FROM users WHERE identifier = ?LIMIT 1
             ]], { source })
             return {
                 citizenid = result.citizenid,
-                fullname = result.fullname,
-                phonenumber = result.phonenumber
+                fullname = result.fullname
             }
         end
     end
@@ -142,15 +137,15 @@ end
 
 if Config.Phone == 'lb' then
     function Framework:SendMail(identifier, data)
-        local player = Framework:GetPlayer(identifier)
-        if not player then return false end
-        local maildata = {
-            to = exports["lb-phone"]:GetEmailAddress(player.phonenumber),
+        local phoneNumber = exports["lb-phone"]:GetEquippedPhoneNumber(identifier)
+        if not phoneNumber then return false end
+        local mailId = exports["lb-phone"]:GetEmailAddress(phoneNumber)
+        exports["lb-phone"]:SendMail({
+            to = mailId,
             sender = data.sender,
             subject = data.subject,
             message = data.message,
-        }
-        exports["lb-phone"]:SendMail(maildata)
+        })
     end
 end
 
