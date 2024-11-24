@@ -145,7 +145,7 @@ if Config.Phone == 'lb' then
         local player = Framework:GetPlayer(identifier)
         if not player then return false end
         local maildata = {
-            to = exports["lb-phone"]:GetEmailAddress(player.phonenumber)
+            to = exports["lb-phone"]:GetEmailAddress(player.phonenumber),
             sender = data.sender,
             subject = data.subject,
             message = data.message,
