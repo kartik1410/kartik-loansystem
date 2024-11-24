@@ -4,13 +4,27 @@ if Config.Framework == 'qb' then
     local QBCore = exports['qb-core']:GetCoreObject()
 
     function Framework:GetPlayer(source)
-        local player = QBCore.Functions.GetPlayer(source)
-        if not player then return false end
-        local _data = {
-            citizenid = player.PlayerData.citizenid,
-            fullname = ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname)
-        }
-        return _data
+        if not source then return false end
+        local player = (type(source) == 'number') and QBCore.Functions.GetPlayer(source)
+        if player then
+            return {
+                citizenid = player.PlayerData.citizenid,
+                fullname = ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname),
+                phonenumber = player.PlayerData.charinfo.phone
+            }
+        else
+            local result = MySQL.single.await([[
+                SELECT citizenid,
+                    CONCAT (JSON_UNQUOTE(JSON_EXTRACT (charinfo, '$.firstname')), ' ', JSON_UNQUOTE (JSON_EXTRACT (charinfo, '$.lastname'))) AS fullname,
+                    JSON_UNQUOTE(JSON_EXTRACT(charinfo, "$.phone")) as phonenumber
+                FROM players WHERE citizenid = ? LIMIT 1
+            ]], { source })
+            return {
+                citizenid = result.citizenid,
+                fullname = result.fullname,
+                phonenumber = result.phonenumber
+            }
+        end
     end
 
     function Framework:AddMoneyByIdentifier(citizenId, type, amount, reason)
@@ -48,13 +62,26 @@ if Config.Framework == 'esx' then
     local ESX = exports.es_extended:getSharedObject()
 
     function Framework:GetPlayer(source)
-        local player = ESX.GetPlayerFromId(source)
-        if not player then return false end
-        local _data = {
-            citizenid = player.identifier,
-            fullname = player.getName()
-        }
-        return _data
+        if not source then return false end
+        local player = (type(source) == 'number') and ESX.GetPlayerFromId(source)
+        if player then
+            return {
+                citizenid = player.identifier,
+                fullname = player.getName()
+            }
+        else
+            local result = MySQL.single.await([[
+                SELECT citizenid,
+                    CONCAT(firstname, ' ', lastname) as fullname,
+                    phone_number as phonenumber
+                FROM users WHERE identifier = ?LIMIT 1
+            ]], { source })
+            return {
+                citizenid = result.citizenid,
+                fullname = result.fullname,
+                phonenumber = result.phonenumber
+            }
+        end
     end
 
     function Framework:AddMoneyByIdentifier(identifier, type, amount, reason)
@@ -110,6 +137,20 @@ if Config.Phone == 'qs' then
             message = data.message,
         }
         TriggerEvent('qs-smartphone:server:sendNewMailToOffline', identifier, maildata)
+    end
+end
+
+if Config.Phone == 'lb' then
+    function Framework:SendMail(identifier, data)
+        local player = Framework:GetPlayer(identifier)
+        if not player then return false end
+        local maildata = {
+            to = exports["lb-phone"]:GetEmailAddress(player.phonenumber)
+            sender = data.sender,
+            subject = data.subject,
+            message = data.message,
+        }
+        exports["lb-phone"]:SendMail(maildata)
     end
 end
 

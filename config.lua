@@ -3,7 +3,7 @@ Config = {}
 Config.debug = false
 
 Config.Framework = 'qb' -- 'qb', 'esx'
-Config.Phone = 'qb' -- 'qb', 'qs', 'none'
+Config.Phone = 'qb' -- 'qb', 'qs', 'lb', 'none'
 Config.Target = 'ox' -- 'qb', 'ox'
 
 --[[(QB TARGET)
