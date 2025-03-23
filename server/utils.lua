@@ -55,6 +55,59 @@ if Config.Framework == 'qb' then
     end
 end
 
+if Config.Framework == 'qbox' then
+    function Framework:GetPlayer(source)
+        if not source then return false end
+        local player = (type(source) == 'number') and exports.qbx_core:GetPlayer(source)
+        if player then
+            return {
+                citizenid = player.PlayerData.citizenid,
+                fullname = ('%s %s'):format(player.PlayerData.charinfo.firstname, player.PlayerData.charinfo.lastname)
+            }
+        else
+            local result = MySQL.single.await([[
+                SELECT citizenid,
+                    CONCAT (JSON_UNQUOTE(JSON_EXTRACT (charinfo, '$.firstname')), ' ', JSON_UNQUOTE (JSON_EXTRACT (charinfo, '$.lastname'))) AS fullname
+                FROM players WHERE citizenid = ? LIMIT 1
+            ]], { source })
+            return {
+                citizenid = result.citizenid,
+                fullname = result.fullname
+            }
+        end
+    end
+
+    function Framework:AddMoneyByIdentifier(citizenId, type, amount, reason)
+        local player = exports.qbx_core:GetPlayerByCitizenId(citizenId)
+        if not player then return false end
+        return player.Functions.AddMoney(type, amount, reason)
+    end
+
+    function Framework:AddMoneyByIdentifierOffline(citizenId, amount)
+        local moneyData = MySQL.Sync.fetchAll('SELECT money FROM players WHERE citizenid = ?', {citizenId })
+        if not moneyData[1] then return false end
+        local moneyInfo = json.decode(moneyData[1].money)
+        moneyInfo.bank = math.floor((moneyInfo.bank + amount))
+        MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?',{ json.encode(moneyInfo), citizenId })
+        return true
+    end
+
+    function Framework:RemoveMoneyByIdentifier(citizenId, type, amount, reason)
+        local player = exports.qbx_core:GetPlayerByCitizenId(citizenId)
+        if not player then return false end
+        return player.Functions.RemoveMoney(type, amount, reason)
+    end
+
+    function Framework:RemoveMoneyByIdentifierOffline(citizenId, amount)
+        local moneyData = MySQL.Sync.fetchAll('SELECT money FROM players WHERE citizenid = ?', {citizenId })
+        if not moneyData[1] then return false end
+        local moneyInfo = json.decode(moneyData[1].money)
+        moneyInfo.bank = math.floor((moneyInfo.bank - amount))
+        MySQL.Async.execute('UPDATE players SET money = ? WHERE citizenid = ?',{ json.encode(moneyInfo), citizenId })
+        return true
+    end
+end
+
 if Config.Framework == 'esx' then
     local ESX = exports.es_extended:getSharedObject()
 

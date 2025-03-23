@@ -43,7 +43,7 @@ AddEventHandler('onResourceStart', function(resourceName)
         Wait(5000)
         loanPaidLoop()
     end                                   -- Start the loop to deduct loan payments
-    if Config.PhoneMails.DueReminder then -- Start the loop to send loan payment reminders on script restart
+    if Config.Phone ~= 'none' and Config.PhoneMails.DueReminder then -- Start the loop to send loan payment reminders on script restart
         local data = MySQL.query.await('SELECT * FROM players_loan WHERE status = 1', {})
         for k, v in pairs(data) do
             local loanDetails = json.decode(v.loan_details)
@@ -277,7 +277,7 @@ RegisterNetEvent('loan-system:server:approveLoan', function(data)
     if not hasRemoved then
         Framework:AddMoneyByIdentifierOffline(cid, tonumber(loanDetails.requestedamount))
     end
-    if Config.PhoneMails.ApproveMail then
+    if Config.Phone ~= 'none' and Config.PhoneMails.ApproveMail then
         local maildata = {
             sender = "Banker",
             subject = "#" .. data.loan_id .. " Loan Approved",
@@ -301,7 +301,7 @@ RegisterNetEvent('loan-system:server:rejectLoan', function(data)
         json.encode(loanDetails),
         data.loan_id,
     })
-    if Config.PhoneMails.DeclineMail then
+    if Config.Phone ~= 'none' and Config.PhoneMails.DeclineMail then
         local maildata = {
             sender = "Banker",
             subject = "#" .. data.loan_id .. " Loan Declined",
@@ -388,7 +388,6 @@ end)
 MySQL.ready(function()
     local success, result = pcall(MySQL.query.await, "SELECT 1 FROM players_loan LIMIT 1")
     if not success then
-        -- Create 'players_loan' table if it doesn't exist
         success, result = pcall(MySQL.query, [[
             CREATE TABLE IF NOT EXISTS `players_loan` (
                 `loan_id` int(11) NOT NULL AUTO_INCREMENT,

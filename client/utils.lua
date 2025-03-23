@@ -2,20 +2,24 @@ local Framework = {}
 
 if Config.Framework == 'qb' then
     local QBCore = exports['qb-core']:GetCoreObject()
-    local PlayerData = QBCore.Functions.GetPlayerData()
-
+    
     function Framework:HasAccess()
-        for _, v in pairs(Config.BankerJob) do
-            if PlayerData.job.name == v then
-                return true
-            end
-        end
-        return false
-    end
+        local PlayerData = QBCore.Functions.GetPlayerData()
+        local grade_level = Config.BankerJobs[PlayerData.job.name]
+        if not grade_level then return false end
 
-    RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
-        PlayerData = val
-    end)
+        if PlayerData.job.grade.level then
+            return PlayerData.job.grade.level == grade_level
+        else
+            return true
+        end
+    end
+end
+
+if Config.Framework == 'qbox' then
+    function Framework:HasAccess()
+        return exports.qbx_core:HasPrimaryGroup(Config.BankerJobs)
+    end
 end
 
 if Config.Framework == 'esx' then
@@ -23,12 +27,14 @@ if Config.Framework == 'esx' then
 
     function Framework:HasAccess()
         local data = ESX.GetPlayerData()
-        for _, v in pairs(Config.BankerJob) do
-            if data.job.name == v then
-                return true
-            end
+        local grade_level = Config.BankerJobs[data.job.name]
+        if not grade_level then return false end
+
+        if data.job.grade then
+            return data.job.grade == grade_level
+        else
+            return true
         end
-        return false
     end
 
 end

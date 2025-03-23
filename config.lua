@@ -2,11 +2,11 @@ Config = {}
 
 Config.debug = false
 
-Config.Framework = 'qb' -- 'qb', 'esx'
+Config.Framework = 'qb' -- 'qb', 'qbox', 'esx'
 Config.Phone = 'qb' -- 'qb', 'qs', 'lb', 'road', 'yseries', 'none'
 Config.Target = 'ox' -- 'qb', 'ox'
 
---[[(QB TARGET)
+if Config.Target == 'qb' then
 Config.TargetZones = {
     [1] = {
         name = 'Pacific Bank', -- Name of the bank
@@ -17,9 +17,8 @@ Config.TargetZones = {
         minZ = 104.0,
         maxZ = 108.0,
     }
-}]]
-
--- (OX TARGET)
+}
+elseif Config.Target == 'ox' then
 Config.TargetZones = {
     [1] = {
         name = 'Pacific Bank', -- Name of the bank
@@ -28,12 +27,14 @@ Config.TargetZones = {
         rotation = 341.75,
     }
 }
+end
 
-Config.BankerJob = { -- Job that can approve or decline loans
-    "banker",
+Config.BankerJobs = { -- Job that can approve or decline loans
+    -- ['job_name'] = grade_level,
+    ["banker"] = 0,
 }
 
-Config.LoanIntervals = 600000    -- 10 minutes
+Config.LoanIntervals = 10 * 60 * 1000    -- 10 minutes
 Config.AutomaticDeduction = true -- Automatically deduct if payment is not made after the due date
 
 Config.LoanTypes = {

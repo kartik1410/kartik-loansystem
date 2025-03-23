@@ -27,6 +27,8 @@ And Much More: This Loan Management System is loaded with additional features to
 - ox_lib
 - oxmysql
 
+> Note: this works with qb / qbox / esx frameworks
+
 # Installation
 
 - Download the resource.
