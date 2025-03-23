@@ -3,7 +3,7 @@ Config = {}
 Config.debug = false
 
 Config.Framework = 'qb' -- 'qb', 'esx'
-Config.Phone = 'qb' -- 'qb', 'qs', 'lb', 'none'
+Config.Phone = 'qb' -- 'qb', 'qs', 'lb', 'road', 'yseries', 'none'
 Config.Target = 'ox' -- 'qb', 'ox'
 
 --[[(QB TARGET)
@@ -48,7 +48,6 @@ Config.Duration = {
     { label = '3 Weeks', value = 3 },
 }
 
-
 Config.CreditScore = {
     Enable                         = true, -- If True, It Will enable increaing and decreasing credit score
     CreditScoreRequirementForLoans = true, -- If True, It Will Check Credit Score For Loans
@@ -88,11 +87,9 @@ Config.CreditScore = {
     },
 }
 
-
-Config.PhoneMails = {   -- qb-phone Compatible
+Config.PhoneMails = {
     DueReminder = true, -- If True, It Will Send Reminder To The Player When Loan Is Due
     Time = 20,          -- It Means Amount Days Before The Loan Is Due Per Restart or Script Restart
     ApproveMail = true, -- If True, It Will Send Mail To The Player When Loan Is Approved
     DeclineMail = true, -- If True, It Will Send Mail To The Player When Loan Is Declined
-
 }

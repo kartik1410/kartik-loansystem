@@ -149,6 +149,28 @@ if Config.Phone == 'lb' then
     end
 end
 
+if Config.Phone == 'road' then
+    function Framework:SendMail(identifier, data)
+        exports['roadphone']:sendMailOffline(identifier,  {
+            sender = data.sender,
+            subject = data.subject,
+            message = data.message,
+        })
+    end
+end
+
+if Config.Phone == 'yseries' then
+    function Framework:SendMail(identifier, data)
+        local phoneNumber = exports.yseries:GetPhoneNumberByIdentifier(identifier)
+        local insertId, received = exports.yseries:SendMail({
+            title = data.subject,
+            sender = 'loanprocess@bank.com', -- change to one of your mail ids
+            senderDisplayName = data.sender,
+            content = data.message,
+        }, 'phoneNumber', phoneNumber)
+    end
+end
+
 if Config.Phone == 'none' then
     function Framework:SendMail(identifier, data) end
 end
