@@ -117,7 +117,8 @@ function HandleScores(cid, operation, amount)
     end
     -- Update the player's credit score
     if operation == "add" then
-        CreditScores[cid] = (CreditScores[cid] or 0) + score
+        local scoreToAdd = (CreditScores[cid] or 0) + score
+        CreditScores[cid] = (scoreToAdd > Config.CreditScore.MaxCreditScore) and Config.CreditScore.MaxCreditScore or scoreToAdd
     else
         CreditScores[cid] = (CreditScores[cid] or 0) - score
         if CreditScores[cid] < 0 then

@@ -3,30 +3,30 @@ Config = {}
 Config.debug = false
 
 Config.Framework = 'qb' -- 'qb', 'qbox', 'esx'
-Config.Phone = 'qb' -- 'qb', 'qs', 'lb', 'road', 'yseries', 'none'
-Config.Target = 'ox' -- 'qb', 'ox'
+Config.Phone = 'qb'     -- 'qb', 'qs', 'lb', 'road', 'yseries', 'none'
+Config.Target = 'ox'    -- 'qb', 'ox'
 
 if Config.Target == 'qb' then
-Config.TargetZones = {
-    [1] = {
-        name = 'Pacific Bank', -- Name of the bank
-        coords = vector3(241.6, 226.2, 106.0),
-        length = 3,
-        width = 3,
-        heading = 0,
-        minZ = 104.0,
-        maxZ = 108.0,
+    Config.TargetZones = {
+        [1] = {
+            name = 'Pacific Bank', -- Name of the bank
+            coords = vector3(241.6, 226.2, 106.0),
+            length = 3,
+            width = 3,
+            heading = 0,
+            minZ = 104.0,
+            maxZ = 108.0,
+        }
     }
-}
 elseif Config.Target == 'ox' then
-Config.TargetZones = {
-    [1] = {
-        name = 'Pacific Bank', -- Name of the bank
-        coords = vec3(241.6, 226.2, 106.0),
-        size = vec3(1, 1, 2),
-        rotation = 341.75,
+    Config.TargetZones = {
+        [1] = {
+            name = 'Pacific Bank', -- Name of the bank
+            coords = vec3(241.6, 226.2, 106.0),
+            size = vec3(1, 1, 2),
+            rotation = 341.75,
+        }
     }
-}
 end
 
 Config.BankerJobs = { -- Job that can approve or decline loans
@@ -34,8 +34,8 @@ Config.BankerJobs = { -- Job that can approve or decline loans
     ["banker"] = 0,
 }
 
-Config.LoanIntervals = 10 * 60 * 1000    -- 10 minutes
-Config.AutomaticDeduction = true -- Automatically deduct if payment is not made after the due date
+Config.LoanIntervals = 10 * 60 * 1000 -- 10 minutes
+Config.AutomaticDeduction = true      -- Automatically deduct if payment is not made after the due date
 
 Config.LoanTypes = {
     { label = 'Personal Loan', value = 'Personal Loan', interest = 0.05 }, -- Interest is applied weekly as selected by the user in the duration.
@@ -58,6 +58,7 @@ Config.CreditScore = {
         ['Home Loan'] = 100,
     },
     DefaultCreditScore             = 500,                               -- Default Credit Score
+    MaxCreditScore                 = 900,                               -- Maximum Credit Scores
     DefaultInterest                = 0.08,                              -- Default Interest
     OptLoan                        = {
         ['Personal Loan'] = {                                           -- In this case, if the player has a credit score of 500, the interest rate will be 0.5 and the maximum amount will be 2000
