@@ -224,6 +224,18 @@ if Config.Phone == 'yseries' then
     end
 end
 
+if Config.Phone == 'snappy-phone' then
+    function Framework:SendMail(identifier, data)
+        local result = exports['snappy-phone']:sendCustomMail({
+            subject = data.subject,
+            sender = 'loanprocess@bank.com', -- change to one of your mail ids
+            recipients = {{ identifier = identifier }},
+            body = data.message,
+        })
+        -- result.status, result.msg
+    end
+end
+
 if Config.Phone == 'none' then
     function Framework:SendMail(identifier, data) end
 end

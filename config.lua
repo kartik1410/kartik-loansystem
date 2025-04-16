@@ -3,7 +3,7 @@ Config = {}
 Config.debug = false
 
 Config.Framework = 'qb' -- 'qb', 'qbox', 'esx'
-Config.Phone = 'qb'     -- 'qb', 'qs', 'lb', 'road', 'yseries', 'none'
+Config.Phone = 'qb'     -- 'qb', 'qs', 'lb', 'road', 'yseries', 'snappy-phone', 'none'
 Config.Target = 'ox'    -- 'qb', 'ox'
 
 if Config.Target == 'qb' then
