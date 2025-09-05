@@ -29,6 +29,10 @@ And Much More: This Loan Management System is loaded with additional features to
 
 > Note: this works with qb / qbox / esx frameworks
 
+# Full Fledged Banking System 
+
+> Kartik’s Banking System | Fleeca + Swiss | Credit, Loans, Payroll & More - https://kartik-scripts.tebex.io/package/6719565
+
 # Installation
 
 - Download the resource.
